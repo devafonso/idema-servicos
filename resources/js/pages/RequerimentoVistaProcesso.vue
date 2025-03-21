@@ -41,6 +41,7 @@ const dataVisitaFormatada = ref('');
 const mensagemErro = ref('');
 const mensagemErro2 = ref('');
 const mensagemErro3 = ref('');
+const mensagemErro4 = ref('');
 
 //Dados do veículo
 const placa = ref('');
@@ -58,12 +59,19 @@ const etapaAnterior = () => {
 
 const etapaSeguinte = () => {
     if (etapaAtual.value === 0) {
+        // Verificar se todos os campos obrigatórios estão preenchidos
         if (nome.value && cpf.value && email.value && telefone.value) {
-            etapaAtual.value = 1; // Dados pessoais avança para a segunda etapa
+            // Validar se o CPF tem exatamente 11 dígitos
+            const cpfValido = cpf.value.length === 14; // Remove caracteres não numéricos e verifica o tamanho
+
+            if (cpfValido) {
+                etapaAtual.value = 1; // Avança para a segunda etapa
+            } else {
+                mensagemErro4.value = '* CPF deve ter exatamente 11 dígitos';
+            }
         } else {
             mensagemErro.value = '* Campo obrigatório';
         }
-
         // Validação dos campos 0
     } else if (etapaAtual.value === 1) {
         if (cep.value && dataVisita.value) {
@@ -209,9 +217,9 @@ function formatCardNumber(input) {
                                         <Label for="cpf">CPF</Label>
                                         <Input id="cpf" v-model="cpf" v-mask="'###.###.###-##'" type="text" placeholder="Digite seu CPF" />
                                         <div class="mt-2 h-1/4 w-1/2">
-                                            <span class="mt-10 rounded px-4 py-1 text-red-700" v-if="!cpf && mensagemErro" id="mensagem-error">{{
-                                                mensagemErro
-                                            }}</span>
+                                            <span class="mt-10 rounded px-4 py-1 text-red-700" v-if="!cpf && mensagemErro4" id="mensagem-error">
+                                                {{ mensagemErro4 }}
+                                            </span>
                                         </div>
                                     </div>
                                     <div>
@@ -472,10 +480,17 @@ function formatCardNumber(input) {
 
         <!-- Mensagem de sucesso -->
 
-        <div v-if="mensagemSucesso" class="fixed inset-0 z-50 flex items-center justify-center bg-[#000000d2] bg-black" id="mensagem-sucesso">
-            <div class="rounded p-6 text-center">
+        <div v-if="mensagemSucesso" class="fixed inset-0 z-50 flex items-center justify-center bg-[#000000d2]" id="mensagem-sucesso">
+            <div class="relative rounded p-6 text-center">
+                <!-- Botão de Fechar X -->
+
                 <div class="flex flex-col justify-between rounded-[2.25rem] border-gray-400 bg-white p-4 lg:border-gray-400">
                     <div class="mb-8">
+                        <button @click="fecharMensagemSucesso" class="absolute right-2 top-2 text-gray-700 hover:text-gray-900">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
                         <div class="mb-10 text-3xl font-bold text-gray-800">
                             Clique aqui para visualizar o<br /><span class="text-6xl text-green-600">ticket</span>
                         </div>
